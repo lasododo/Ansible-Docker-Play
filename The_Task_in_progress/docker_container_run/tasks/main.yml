@@ -1,0 +1,30 @@
+---
+# tasks file for ./docker_container_run
+# - name: run container
+#   command: docker run -d -p 8080:8080 django_plau /bin/sh -c "python app/manage.py runserver 0.0.0.0:8080"
+
+- name: Pulling {{ image }}
+  docker_image:
+    name: "{{ image }}"
+    source: pull
+
+- name: Running the {{ image }} container
+  docker_container:
+    name: "{{ image }}"
+    image: "{{ image }}"
+    ports:
+    - "9500:9500"
+    tty: true
+    detach: true
+    state: started
+
+# NGINX ONLY
+#- name: test if it works {{image}}
+#  command: docker exec -it nginx service nginx status
+#  register: check_it
+#- debug: var=check_it.stdout
+
+- name: check container status [ {{ image }} ]
+  command: docker ps
+  register: result
+- debug: var=result.stdout

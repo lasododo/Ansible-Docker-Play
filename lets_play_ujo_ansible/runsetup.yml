@@ -1,0 +1,5 @@
+---
+- name: lets see
+  hosts: localhost
+  roles:
+  - first_try

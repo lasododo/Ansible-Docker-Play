@@ -1,0 +1,28 @@
+docker run -d -p 5000:5000 --restart=always --name registry registry:2
+docker pull ubuntu:16.04
+docker tag ubuntu:16.04 localhost:5000/my-ubuntu
+docker push localhost:5000/my-ubuntu
+docker image remove ubuntu:16.04
+docker image remove localhost:5000/my-ubuntu
+docker pull localhost:5000/my-ubuntu
+docker container stop registry
+
+
+
+- name: Create docker_data/images
+  command: mkdir -p /docker_data/images
+- name: Create pull registry + run it as a deamon ( official docker registry )
+  # command: docker run -d -p 8000:5000 -v /Users/stylez/Desktop/Docker/The_Task/docker_data/images:/var/lib/registry --restart on-failure --name myregistry registry
+  command: docker run -d -p 8000:5000 -v /docker_data/images:/var/lib/registry --restart on-failure --name myregistry registry
+- name: pull httpd
+  command: docker pull httpd
+- name: pull nginx
+  command: docker pull nginx
+- name: tag httpd + nginx
+  command: docker tag httpd localhost:8000/my-httpd
+- name: tag  nginx
+  command: docker tag nginx localhost:8000/my-nginx
+- name: push httpd + nginx
+  command: docker push localhost:8000/my-httpd
+- name: push nginx
+  command: docker push localhost:8000/my-nginx

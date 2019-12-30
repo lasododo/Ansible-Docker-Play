@@ -1,0 +1,31 @@
+---
+
+- name: Ansible check directory.
+  become: yes
+  become_user: root
+  stat:
+    path: /tmp/docker_image_build
+  register: my_folder
+
+- name: "Ansible Create directory if not exists"
+  become: yes
+  become_user: root
+  file:
+    path: /tmp/docker_image_build
+    state: directory
+  when: my_folder.stat.exists == false
+
+- name: copy files [local -> remote]
+  become: yes
+  become_user: root
+  copy:
+    src: ./roles/docker_image_build/templates/docker_dir
+    dest: /tmp/docker_image_build
+
+- name: Build Docker image from Dockerfile ( name will be -> "web_image" )
+  become: yes
+  become_user: root
+  docker_image:
+    name: web_image
+    path: /tmp/docker_image_build/docker_dir
+    state: build

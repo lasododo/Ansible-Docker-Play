@@ -1,0 +1,48 @@
+- name: testing
+  hosts: ujo_reg
+  become: yes
+  become_user: root
+  tasks:
+  - name: apt update
+    command: apt update
+
+  - name: Install pip
+    apt: name=python3-pip
+
+  - name: Check if installed
+    command: pip3 --version
+
+  - name: install docker-py
+    pip: executable=pip3 name=docker-py
+
+  - name: copy files
+    copy:
+      src: ./docker_stuff
+      dest: /tmp/
+    register: not_found
+
+  - name: Build Docker image from Dockerfile
+    docker_image:
+      name: web
+      path: /tmp/docker_stuff
+      state: build
+
+  - name: Pulling nginx
+    docker_image:
+      name: nginx
+      source: pull
+
+  - name: Running the container
+    docker_container:
+      name: nginx
+      image: nginx
+      ports:
+      - "9500:9500"
+      tty: true
+      detach: true
+      state: started
+
+  - name: check container status
+    command: docker ps
+    register: result
+  - debug: var=result.stdout

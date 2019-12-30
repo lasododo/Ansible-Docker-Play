@@ -1,0 +1,16 @@
+- name: testing
+  hosts: ujo_reg
+  become: yes
+  become_user: root
+  tasks:
+
+  - name: copy files
+    copy:
+      src: ./docker_stuff
+      dest: /tmp/
+    register: not_found
+
+  - name: run docker_compose
+    docker_compose:
+      project_src: /tmp/docker_stuff
+      state: present

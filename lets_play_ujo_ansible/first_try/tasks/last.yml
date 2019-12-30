@@ -1,0 +1,6 @@
+- name: time to play
+  shell: "echo {{ item }}"
+  loop:
+    - "one"
+    - "two"
+  register: echo

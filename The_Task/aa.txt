@@ -1,0 +1,51 @@
+
+PLAY [initialise_whole_project] *****************************************************************************
+
+TASK [Gathering Facts] **************************************************************************************
+ok: [remote_serv_1]
+
+TASK [include variables] ************************************************************************************
+ok: [remote_serv_1]
+
+PLAY [do it with ip] ****************************************************************************************
+
+TASK [Gathering Facts] **************************************************************************************
+ok: [localhost]
+
+TASK [gather facts] *****************************************************************************************
+ok: [localhost -> None]
+
+TASK [set_fact] *********************************************************************************************
+ok: [localhost -> None]
+
+TASK [debug] ************************************************************************************************
+ok: [localhost] => {
+    "hostvars['remote_serv_1']['ansible_enp0s8']['ipv4']['address']": "192.168.56.104"
+}
+
+PLAY [initialise_whole_project] *****************************************************************************
+
+TASK [Gathering Facts] **************************************************************************************
+ok: [remote_serv_2]
+
+TASK [include variables] ************************************************************************************
+ok: [remote_serv_2]
+
+TASK [debug] ************************************************************************************************
+ok: [remote_serv_2] => {
+    "variable_x": "192.168.56.104"
+}
+
+PLAY [docker run] *******************************************************************************************
+
+TASK [Gathering Facts] **************************************************************************************
+ok: [remote_serv_2]
+
+TASK [docker_registry_pull_and_push : debug] ****************************************************************
+fatal: [remote_serv_2]: FAILED! => {"msg": "The task includes an option with an undefined variable. The error was: 'ansible.vars.hostvars.HostVarsVars object' has no attribute 'variable_x'\n\nThe error appears to be in '/Users/stylez/Desktop/Docker/The_Task/roles/docker_registry_pull_and_push/tasks/main.yml': line 3, column 3, but may\nbe elsewhere in the file depending on the exact syntax problem.\n\nThe offending line appears to be:\n\n\n- debug: var=\"{{variable}}\"\n  ^ here\nWe could be wrong, but this one looks like it might be an issue with\nmissing quotes. Always quote template expression brackets when they\nstart a value. For instance:\n\n    with_items:\n      - {{ foo }}\n\nShould be written as:\n\n    with_items:\n      - \"{{ foo }}\"\n"}
+
+PLAY RECAP **************************************************************************************************
+localhost                  : ok=4    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+remote_serv_1              : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+remote_serv_2              : ok=4    changed=0    unreachable=0    failed=1    skipped=0    rescued=0    ignored=0   
+

@@ -1,0 +1,18 @@
+---
+
+- name: initialisation
+  hosts: ujo_reg
+  become: yes
+  become_user: root
+  tasks:
+    - name: include variables
+      include_vars: vars.yml
+
+- name: real run
+  hosts: ujo_reg
+  become: yes
+  become_user: root
+  roles:
+    - docker_registry
+    - docker_image_build
+    - docker_container_run

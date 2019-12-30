@@ -1,0 +1,44 @@
+---
+
+- name: Ansible check directory.
+  stat:
+    path: /tmp/docker_registry
+  register: my_folder
+
+- name: "Ansible Create directory if not exists"
+  file:
+    path: /tmp/docker_registry
+    state: directory
+  when: my_folder.stat.exists == false
+
+- name: Copying required files
+  template:
+    src: docker-compose.yml
+    dest: /tmp/docker_registry
+
+- name: run docker_compose to create registry
+  docker_compose:
+    project_src: /tmp/docker_registry
+    state: present
+
+- name: Pulling "{{ image }}"
+  docker_image:
+    name: "{{ image }}"
+    source: pull
+
+- name: Tag and push to local registry [ {{ image }} ]
+  docker_image:
+    name: "{{ image }}"
+    repository: localhost:5000/{{ image }}
+    push: yes
+    source: local
+
+- name: remove image -> [ {{ image }} ]
+  docker_image:
+    state: absent
+    name: "{{ image }}"
+
+- name: pull an image from registry
+  docker_image:
+    name: localhost:5000/{{ image }}
+    source: pull

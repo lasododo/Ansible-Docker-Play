@@ -1,0 +1,42 @@
+mkdir -p /Users/stylez/Desktop/Docker/testing/docker_data/certs/
+yum -y install openssl
+
+openssl req \
+  -newkey rsa:4096 -nodes -sha256 -keyout /Users/stylez/Desktop/Docker/testing/docker_data/certs/domain.key \
+  -x509 -days 365 -out /Users/stylez/Desktop/Docker/testing/docker_data/certs/domain.crt
+
+mkdir -p /docker_data/images
+docker run -d -p 8000:5000 \
+-v /Users/stylez/Desktop/Docker/testing/docker_data/images:/var/lib/registry \
+-v /Users/stylez/Desktop/Docker/testing/docker_data/certs:/certs \
+-e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/domain.crt \
+-e REGISTRY_HTTP_TLS_KEY=/certs/domain.key \
+--restart on-failure \
+--name myregistry \
+registry
+docker pull httpd
+docker pull nginx
+docker tag httpd localhost:8000/my-httpd
+docker tag nginx localhost:8000/my-nginx
+docker push localhost:8000/my-httpd
+docker push localhost:8000/my-nginx
+
+
+
+sudo docker run -d -p 8000:5000 \
+-v /docker_data/images:/var/lib/registry \
+--restart on-failure \
+--name myregistry \
+registry
+docker pull httpd
+docker pull nginx
+docker tag httpd 192.168.56.104:8000/my-httpd
+docker tag nginx 192.168.56.104:8000/my-nginx
+docker push 192.168.56.104:8000/my-httpd
+docker push 192.168.56.104:8000/my-nginx
+
+sudo docker run -d -p 8000:5000 \
+-v /docker_data/images:/var/lib/registry \
+--restart on-failure \
+--name myregistry \
+registry

@@ -1,0 +1,59 @@
+- name: This is a hello-world example
+  hosts: localhost
+  tasks:
+    - name: Create a file called '/tmp/testfile.txt' with the content 'hello world'.
+      copy:
+        src: ./testfile.txt
+        dest: ./testfile2.txt
+    - debug:
+        msg: passed 1st task
+    - name: ping server in task
+      ping:
+    - debug:
+        msg: passed 2nd task
+
+- name: ping server
+  hosts: localhost
+  tasks:
+    - name: Pinging
+      ping:
+    - debug:
+        msg: passed localhost ping task
+      loop:
+        - 1
+        - 2
+        - 3
+
+- name: lets play with files
+  hosts: localhost
+  tasks:
+  - name: Create a directory if it does not exist
+    file:
+      path: ./hello_world
+      state: directory
+  - name: Create two hard links
+    file:
+      src: './{{ item.src }}'
+      dest: './{{ item.dest }}'
+      state: link
+    with_items:
+      - { src: testfile.txt, dest: testfile3.txt }
+      - { src: testfile2.txt, dest: x_testfile.txt }
+      # - { src: testfile2.txt, dest: ./hello_world/x_testfile.txt }
+
+- name: lets play with loops
+  hosts: localhost
+  tasks:
+  - name: time to play
+    shell: "echo {{ item }}"
+    loop:
+      - "one"
+      - "two"
+    register: echo
+  - name: time to play
+    shell: "python {{ item }}"
+    loop:
+      - "python_file.py"
+    register: echo
+  - name: time to play
+    command: python python_file.py

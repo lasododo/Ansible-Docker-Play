@@ -1,0 +1,38 @@
+---
+
+- debug: var=variable
+
+- name: include variables
+  include_vars: main.yml
+
+
+- name: Pulling "{{ image }}"
+  become: yes
+  become_user: root
+  docker_image:
+    name: "{{ image }}"
+    source: pull
+
+- name: Tag and push to local registry [ {{ image }} ]
+  become: yes
+  become_user: root
+  docker_image:
+    name: "{{ image }}"
+    repository: '{{ variable }}{{ ":" }}{{ x_port }}/{{ image }}'
+    push: yes
+    source: local
+
+
+- name: remove image -> [ {{ image }} ]
+  become: yes
+  become_user: root
+  docker_image:
+    state: absent
+    name: "{{ image }}"
+
+- name: pull an image from registry
+  become: yes
+  become_user: root
+  docker_image:
+    name: 192.168.56.104:{{ x_port }}/{{ image }}
+    source: pull

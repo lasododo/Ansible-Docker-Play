@@ -1,0 +1,30 @@
+---
+
+- name: Ansible check directory.
+  become: yes
+  become_user: root
+  stat:
+    path: /tmp/docker_registry
+  register: my_folder
+
+- name: "Ansible Create directory if not exists"
+  become: yes
+  become_user: root
+  file:
+    path: /tmp/docker_registry
+    state: directory
+  when: my_folder.stat.exists == false
+
+- name: Copying required files
+  become: yes
+  become_user: root
+  template:
+    src: docker-compose.yml
+    dest: /tmp/docker_registry
+
+- name: run docker_compose to create registry
+  become: yes
+  become_user: root
+  docker_compose:
+    project_src: /tmp/docker_registry
+    state: present

@@ -1,0 +1,27 @@
+---
+
+- name: Pulling {{ image }}
+  become: yes
+  become_user: root
+  docker_image:
+    name: "{{ image }}"
+    source: pull
+
+- name: Running the {{ image }} container
+  become: yes
+  become_user: root
+  docker_container:
+    name: "{{ image }}"
+    image: "{{ image }}"
+    ports:
+    - "{{ app_port }}:{{ app_port }}"
+    tty: true
+    detach: true
+    state: started
+
+- name: check container status [ {{ image }} ]
+  become: yes
+  become_user: root
+  command: docker ps
+  register: result
+- debug: var=result.stdout

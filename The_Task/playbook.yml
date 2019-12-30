@@ -1,0 +1,53 @@
+---
+
+- name: initialise_whole_project
+  hosts: remote_serv_1
+  tasks:
+  - name: include variables
+    include_vars: ./roles/docker_registry_pull_and_push/vars/main.yml
+
+- name: do it with ip
+  hosts: localhost
+  tasks:
+    - name: gather facts
+      setup:
+      delegate_to: remote_serv_1
+      delegate_facts: True
+    - set_fact:
+        variable_x: "{{ hostvars['remote_serv_1']['ansible_enp0s8']['ipv4']['address'] }}"
+      delegate_to: remote_serv_2
+      delegate_facts: True
+    - debug: var=hostvars['remote_serv_1']['ansible_enp0s8']['ipv4']['address']
+
+- name: initialise_whole_project
+  hosts: remote_serv_2
+  gather_facts: yes
+  tasks:
+  - name: include variables
+    include_vars: ./roles/docker_registry_pull_and_push/vars/main.yml
+  - debug: var=variable_x
+
+- name: docker run
+  hosts: remote_serv_2
+  roles:
+    - role: docker_registry_pull_and_push
+      variable: "{{ variable_x }}"
+
+
+
+- name: docker run
+  hosts: remote_serv_1
+  roles:
+    - docker_registry
+
+# here
+
+- name: docker run
+  hosts: remote_serv_1
+  roles:
+    - docker_image_build
+
+- name: docker run
+  hosts: remote_serv_1
+  roles:
+    - docker_container_run

@@ -1,0 +1,23 @@
+---
+# tasks file for ./docker_image_build
+#- name: Create image
+#  command: docker build -t django_plau ./docker_stuff/
+#- name: tag it
+#  command: docker tag django_plau 192.168.56.104:8000/django_plau
+#- name: push it
+#  command: docker push 192.168.56.104:8000/django_plau
+
+# - name: [] apt update
+#  command: apt update
+
+#- name: Install pip
+#  apt: name=python3-pip
+
+#- name: install docker-py
+#  pip: executable=pip3 name=docker-py
+
+- name: Build Docker image from Dockerfile ( name will be -> "web" )
+  docker_image:
+    name: web
+    path: /tmp/docker_stuff
+    state: build

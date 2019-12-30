@@ -1,0 +1,39 @@
+---
+# there are 2 ways how to do it ( one i will keep commented )
+# the reason why is that other one is to copy files from local machine
+# to remote using scp and then executing the command bellow :
+#      ###### HERE IS DOCKER REGISTRY WITH FRONT-END #######
+# - name: Creates running docker registry
+#   command: docker-compose -f ./DockerComposeFile/docker-compose.yml up -d
+#      ###### HERE IS NORMAL DOCKER REGISTRY ( basic one ) ######
+
+# - name: Create pull registry + run it as a deamon ( official docker registry )
+  # delete -d if you do not want it run as a deamon
+  # command: sudo docker run -d -p 8000:5000 -v /docker_data/images:/var/lib/registry --restart on-failure --name myregistry registry
+
+- name: run docker_compose to create registry
+  docker_compose:
+    project_src: /tmp/docker_stuff
+    state: present
+
+- name: Pulling "{{ image }}"
+  docker_image:
+    name: "{{ image }}"
+    source: pull
+
+- name: Tag and push to local registry [ {{ image }} ]
+  docker_image:
+    name: "{{ image }}"
+    repository: localhost:5000/{{ image }}
+    push: yes
+    source: local
+
+- name: Tag and push to local registry [ {{ image }} ]
+  docker_image:
+    state: absent
+    name: "{{ image }}"
+
+- name: pull an image
+  docker_image:
+    name: localhost:5000/{{ image }}
+    source: pull

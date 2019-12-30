@@ -1,0 +1,22 @@
+---
+
+- name: initialisation
+  hosts: ujo_reg
+  become: yes
+  become_user: root
+  tasks:
+    - name: copy files [local -> remote]
+      copy:
+        src: ./docker_stuff
+        dest: /tmp/
+    - name: include variables
+      include_vars: vars.yml
+
+- name: lets see
+  hosts: ujo_reg
+  become: yes
+  become_user: root
+  roles:
+  - docker_registry
+  - docker_image_build
+  - docker_container_run

@@ -1,0 +1,21 @@
+---
+
+- name: Pulling {{ image }}
+  docker_image:
+    name: "{{ image }}"
+    source: pull
+
+- name: Running the {{ image }} container
+  docker_container:
+    name: "{{ image }}"
+    image: "{{ image }}"
+    ports:
+    - "9500:9500"
+    tty: true
+    detach: true
+    state: started
+
+- name: check container status [ {{ image }} ]
+  command: docker ps
+  register: result
+- debug: var=result.stdout

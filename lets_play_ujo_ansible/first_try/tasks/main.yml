@@ -1,0 +1,13 @@
+- name: time to play
+  shell: "python {{ item }}"
+  loop:
+    - "python_file.py"
+  register: echo
+- name: time to play
+  command: python python_file.py
+- name: time to play
+  shell: "echo {{ item }}"
+  loop:
+    - "one"
+    - "two"
+  register: echo
